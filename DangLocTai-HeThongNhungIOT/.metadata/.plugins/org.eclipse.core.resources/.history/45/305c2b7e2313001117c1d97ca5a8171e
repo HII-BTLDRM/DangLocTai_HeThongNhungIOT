@@ -1,0 +1,93 @@
+#include <stdint.h>
+#include <stm32f401re_gpio.h>
+#include <stm32f401re_rcc.h>
+
+// --- ĐỊNH NGHĨA CHÂN CẮM (Theo Kit mở rộng) ---
+#define LED_RED_PORT     GPIOB
+#define LED_RED_PIN      GPIO_Pin_13
+
+#define BUTTON_B2_PORT   GPIOB
+#define BUTTON_B2_PIN    GPIO_Pin_3
+
+// --- HÀM ÉP XUNG NHỊP VỀ 8MHz (Giúp Proteus chạy mượt) ---
+void SystemClock_Config_8MHz(void) {
+    RCC_HCLKConfig(RCC_SYSCLK_Div2);
+}
+
+// --- HÀM DELAY CHUẨN (8MHz) ---
+void delay_ms(volatile uint32_t ms) {
+    for (volatile uint32_t i = 0; i < (ms * 1000); i++);
+}
+
+// --- HÀM KHỞI TẠO LED ĐỎ (PB13) ---
+void LedRed_Init(void) {
+    GPIO_InitTypeDef GPIO_InitStruct;
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE); // Cấp clock cho Port B
+
+    GPIO_InitStruct.GPIO_Pin = LED_RED_PIN;
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
+
+    GPIO_Init(LED_RED_PORT, &GPIO_InitStruct);
+}
+
+// --- HÀM KHỞI TẠO NÚT NHẤN B2 (PB3) ---
+void Button_B2_Init(void) {
+    GPIO_InitTypeDef GPIO_InitStruct;
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE); // Cấp clock cho Port B
+
+    GPIO_InitStruct.GPIO_Pin = BUTTON_B2_PIN;
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP; // Bật trở kéo lên nội bộ
+
+    GPIO_Init(BUTTON_B2_PORT, &GPIO_InitStruct);
+}
+
+// ==========================================
+// CHƯƠNG TRÌNH CHÍNH
+// ==========================================
+int main(void) {
+    uint8_t led_state = 0; // Biến lưu trạng thái đèn (0: Tắt, 1: Sáng)
+
+    // 1. Ép xung nhịp về 8MHz
+    SystemClock_Config_8MHz();
+
+    // 2. Khởi tạo phần cứng
+    LedRed_Init();
+    Button_B2_Init();
+
+    // 3. Tắt đèn khi mới cấp điện (Mức LOW)
+    GPIO_ResetBits(LED_RED_PORT, LED_RED_PIN);
+
+    // 4. Vòng lặp vô tận
+    while (1) {
+        // Đọc chân PB3. Vì đã cấu hình Pull-up nên khi nhấn nút sẽ là mức 0 (Bit_RESET)
+        if (GPIO_ReadInputDataBit(BUTTON_B2_PORT, BUTTON_B2_PIN) == Bit_RESET) {
+
+            delay_ms(20); // Chống rung lần 1
+
+            // Xác nhận lại việc nhấn nút
+            if (GPIO_ReadInputDataBit(BUTTON_B2_PORT, BUTTON_B2_PIN) == Bit_RESET) {
+
+                led_state = !led_state; // Đảo trạng thái
+
+                // Xuất tín hiệu ra đèn LED đỏ
+                if (led_state == 1) {
+                    GPIO_SetBits(LED_RED_PORT, LED_RED_PIN);   // Bật đèn
+                } else {
+                    GPIO_ResetBits(LED_RED_PORT, LED_RED_PIN); // Tắt đèn
+                }
+
+                // Vòng lặp chờ nhả nút
+                while (GPIO_ReadInputDataBit(BUTTON_B2_PORT, BUTTON_B2_PIN) == Bit_RESET);
+
+                delay_ms(20); // Chống rung lúc nhả nút
+            }
+        }
+    }
+
+    return 0;
+}

@@ -2,7 +2,7 @@
 "./SDK_1.0.3_NUCLEO-F401RE/shared/Drivers/STM32F401RE_StdPeriph_Driver/src/stm32f401re_rcc.o"
 "./SDK_1.0.3_NUCLEO-F401RE/shared/Utilities/buff.o"
 "./SDK_1.0.3_NUCLEO-F401RE/shared/Utilities/utilities.o"
-"./Src/Bai1.o"
+"./Src/Bai3.o"
 "./Src/syscalls.o"
 "./Src/sysmem.o"
 "./Startup/startup_stm32f401retx.o"

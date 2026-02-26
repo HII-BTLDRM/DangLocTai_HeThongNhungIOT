@@ -1,0 +1,5 @@
+Bai2.c:13:6:SystemClock_Config_8MHz	8	static
+Bai2.c:20:6:delay_ms	24	static
+Bai2.c:26:6:Buzzer_Init	16	static
+Bai2.c:40:6:Button_Init	16	static
+Bai2.c:55:5:main	16	static

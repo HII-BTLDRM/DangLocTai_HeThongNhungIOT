@@ -1,0 +1,220 @@
+/*******************************************************************************
+ *				 _ _                                             _ _
+ *				|   |                                           (_ _)
+ *				|   |        _ _     _ _   _ _ _ _ _ _ _ _ _ _   _ _
+ *				|   |       |   |   |   | |    _ _     _ _    | |   |
+ *				|   |       |   |   |   | |   |   |   |   |   | |   |
+ *				|   |       |   |   |   | |   |   |   |   |   | |   |
+ *				|   |_ _ _  |   |_ _|   | |   |   |   |   |   | |   |
+ *				|_ _ _ _ _| |_ _ _ _ _ _| |_ _|   |_ _|   |_ _| |_ _|
+ *								(C)2022 Lumi
+ * Copyright (c) 2022
+ * Lumi, JSC.
+ * All Rights Reserved
+ *
+ * File name: main.c
+ *
+ * Description: Clean code
+ *
+ *
+ * Last Changed By:  $Author: trungnt $
+ * Revision:         $Revision: $
+ * Last Changed:     $Date: $April 24, 2022
+ *
+ *
+ ******************************************************************************/
+/******************************************************************************/
+/* INCLUDE FILES                                 */
+/******************************************************************************/
+
+#include <stdint.h>
+#include <stm32f401re_gpio.h>
+#include <stm32f401re_rcc.h>
+#include <typedefs.h>
+/******************************************************************************/
+/* PRIVATE TYPES and DEFINITIONS                         */
+/******************************************************************************/
+#define	LOW									0
+#define BTN_PRESS							LOW
+// Define Logic GPIO_PIN
+
+#define GPIO_PIN_SET						1
+#define GPIO_PIN_RESET						0
+#define GPIO_PIN_LOW						0
+#define GPIO_PIN_HIGH						1
+
+// Define GPIO PIN
+
+#define BUZZER_GPIO_PORT					GPIOC
+#define BUZZER_GPIO_PIN						GPIO_Pin_9
+#define BUZZER_PIN9							9
+#define BUZZERControl_SetClock				RCC_AHB1Periph_GPIOC
+
+#define BUTTON_GPIO_PORT					GPIOB
+#define BUTTON_GPIO_PIN						GPIO_Pin_5
+#define BUTTON_PIN5							5
+#define BUTTONControl_SetClock				RCC_AHB1Periph_GPIOB
+
+/******************************************************************************/
+/* PRIVATE DATA                                  */
+/******************************************************************************/
+
+/******************************************************************************/
+/* EXPORTED DATA                                 */
+/******************************************************************************/
+
+/******************************************************************************/
+/* PRIVATE FUNCTIONS                               */
+/******************************************************************************/
+
+/**
+ * @func   delay_t
+ * @brief  delay time
+ * @param  time
+ * @retval None
+ */
+static void_t delay_t(u16_t time) {
+
+	u16_t i, j;
+
+	for (i = 0; i < time; i++) {
+		for (j = 0; j < 0x2AFF; j++);
+	}
+}
+
+/**
+ * @func   buzzer_Init
+ * @brief  Initialize GPIO for buzzer
+ * @param  None
+ * @retval None
+ */
+static void_t buzzer_Init(void_t) {
+
+	GPIO_InitTypeDef GPIO_InitStructure;
+
+	RCC_AHB1PeriphClockCmd(BUZZERControl_SetClock, ENABLE);
+
+	GPIO_InitStructure.GPIO_Pin = BUZZER_GPIO_PIN;
+
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
+
+	GPIO_Init(BUZZER_GPIO_PORT, &GPIO_InitStructure);
+
+}
+
+/**
+ * @func   button_Init
+ * @brief  Initialize GPIO for button
+ * @param  None
+ * @retval None
+ */
+static void_t button_Init(void_t) {
+
+	GPIO_InitTypeDef GPIO_InitStructure;
+
+	RCC_AHB1PeriphClockCmd(BUTTONControl_SetClock, ENABLE);
+
+	GPIO_InitStructure.GPIO_Pin = BUTTON_GPIO_PIN;
+
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+
+	GPIO_Init(BUTTON_GPIO_PORT, &GPIO_InitStructure);
+}
+
+
+/**
+ * @func   buzzerControlSetStatus
+ * @brief  control status buzzer
+ * @param  Port, pin
+ * @retval None
+ */
+static void_t buzzerControlSetStatus(GPIO_TypeDef *pGPIOx, u16_t wGPIO_Pin,
+		u8_t byStatus) {
+	// SET bit in BSRR Registers
+
+	if (byStatus == GPIO_PIN_SET) {
+		pGPIOx->BSRRL = wGPIO_Pin;
+	}
+	if (byStatus == GPIO_PIN_RESET) {
+		pGPIOx->BSRRH = wGPIO_Pin;
+	}
+}
+
+/**
+ * @func   buttonReadStatus
+ * @brief  read status button
+ * @param  Port, pin
+ * @retval None
+ */
+
+static u8_t buttonReadStatus(GPIO_TypeDef *pGPIOx, u16_t wGPIO_Pin) {
+	u8_t Read_Pin = 0x00;
+
+	if ((pGPIOx->IDR & wGPIO_Pin) != (uint32_t) Bit_RESET) {
+		Read_Pin = (u8_t) Bit_SET;
+	} else {
+		Read_Pin = (u8_t) Bit_RESET;
+	}
+	return Read_Pin;
+}
+
+
+/******************************************************************************/
+/* EXPORTED FUNCTIONS                              */
+/******************************************************************************/
+
+int main(void) {
+	// Biến lưu trạng thái của còi (0: Tắt, 1: Kêu)
+	u8_t buzzer_state = 0;
+
+	SystemCoreClockUpdate();
+
+	// Khởi tạo phần cứng
+	buzzer_Init();
+	button_Init();
+
+	// Tắt còi khi vừa cấp điện
+	buzzerControlSetStatus(BUZZER_GPIO_PORT, BUZZER_GPIO_PIN, GPIO_PIN_LOW);
+
+	while (1) {
+		// Kiểm tra nút nhấn (Nút Pull-up nên khi nhấn là mức LOW)
+		if (buttonReadStatus(BUTTON_GPIO_PORT, BUTTON_GPIO_PIN) == BTN_PRESS) {
+
+			// Chống rung cơ học lần 1 bằng hàm delay của giảng viên
+			delay_t(20);
+
+			// Kiểm tra lại để chắc chắn nút thực sự được nhấn
+			if (buttonReadStatus(BUTTON_GPIO_PORT, BUTTON_GPIO_PIN) == BTN_PRESS) {
+
+				// Đảo trạng thái biến
+				buzzer_state = !buzzer_state;
+
+				// Xuất tín hiệu ra chân Buzzer (PC9)
+				if (buzzer_state == 1) {
+					buzzerControlSetStatus(BUZZER_GPIO_PORT, BUZZER_GPIO_PIN, GPIO_PIN_HIGH);
+				} else {
+					buzzerControlSetStatus(BUZZER_GPIO_PORT, BUZZER_GPIO_PIN, GPIO_PIN_LOW);
+				}
+
+				// Vòng lặp chờ nhả nút: Bắt vi điều khiển đứng im tại đây cho đến khi nút được thả ra
+				while (buttonReadStatus(BUTTON_GPIO_PORT, BUTTON_GPIO_PIN) == BTN_PRESS) {
+					// Không làm gì cả
+				}
+
+				// Chống rung cơ học lúc nhả nút
+				delay_t(20);
+			}
+		}
+	}
+	return 0;
+}

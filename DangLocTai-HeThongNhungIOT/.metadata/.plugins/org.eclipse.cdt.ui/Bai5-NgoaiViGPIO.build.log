@@ -1,6 +1,6 @@
-20:43:37 **** Incremental Build of configuration Debug for project Bai5-NgoaiViGPIO ****
+21:57:38 **** Incremental Build of configuration Debug for project Bai5-NgoaiViGPIO ****
 make -j4 all 
-arm-none-eabi-gcc "../Src/Bai1.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DNUCLEO_F401RE -DSTM32 -DSTM32F401RETx -DSTM32F4 -c -I../Inc -I"C:/Users/PC/Downloads/SDK_1.0.3_NUCLEO-F401RE/shared/Drivers/CMSIS/Include" -I"C:/Users/PC/Downloads/SDK_1.0.3_NUCLEO-F401RE/shared/Drivers/STM32F401RE_StdPeriph_Driver/inc" -I"C:/Users/PC/Downloads/SDK_1.0.3_NUCLEO-F401RE/shared/Middle/button" -I"C:/Users/PC/Downloads/SDK_1.0.3_NUCLEO-F401RE/shared/Middle/buzzer" -I"C:/Users/PC/Downloads/SDK_1.0.3_NUCLEO-F401RE/shared/Middle/led" -I"C:/Users/PC/Downloads/SDK_1.0.3_NUCLEO-F401RE/shared/Middle/rtos" -I"C:/Users/PC/Downloads/SDK_1.0.3_NUCLEO-F401RE/shared/Middle/sensor" -I"C:/Users/PC/Downloads/SDK_1.0.3_NUCLEO-F401RE/shared/Middle/serial" -I"C:/Users/PC/Downloads/SDK_1.0.3_NUCLEO-F401RE/shared/Middle/ucglib" -I"C:/Users/PC/Downloads/SDK_1.0.3_NUCLEO-F401RE/shared/Utilities" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Src/Bai1.d" -MT"Src/Bai1.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Src/Bai1.o"
+arm-none-eabi-gcc "../Src/Bai3.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DNUCLEO_F401RE -DSTM32 -DSTM32F401RETx -DSTM32F4 -c -I../Inc -I"C:/Users/PC/Downloads/SDK_1.0.3_NUCLEO-F401RE/shared/Drivers/CMSIS/Include" -I"C:/Users/PC/Downloads/SDK_1.0.3_NUCLEO-F401RE/shared/Drivers/STM32F401RE_StdPeriph_Driver/inc" -I"C:/Users/PC/Downloads/SDK_1.0.3_NUCLEO-F401RE/shared/Middle/button" -I"C:/Users/PC/Downloads/SDK_1.0.3_NUCLEO-F401RE/shared/Middle/buzzer" -I"C:/Users/PC/Downloads/SDK_1.0.3_NUCLEO-F401RE/shared/Middle/led" -I"C:/Users/PC/Downloads/SDK_1.0.3_NUCLEO-F401RE/shared/Middle/rtos" -I"C:/Users/PC/Downloads/SDK_1.0.3_NUCLEO-F401RE/shared/Middle/sensor" -I"C:/Users/PC/Downloads/SDK_1.0.3_NUCLEO-F401RE/shared/Middle/serial" -I"C:/Users/PC/Downloads/SDK_1.0.3_NUCLEO-F401RE/shared/Middle/ucglib" -I"C:/Users/PC/Downloads/SDK_1.0.3_NUCLEO-F401RE/shared/Utilities" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Src/Bai3.d" -MT"Src/Bai3.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Src/Bai3.o"
 arm-none-eabi-gcc -o "Bai5-NgoaiViGPIO.elf" @"objects.list"  -lLibraries -mcpu=cortex-m4 -T"C:\Users\PC\Desktop\New folder\DangLocTai-HeThongNhungIOT\Bai5-NgoaiViGPIO\STM32F401RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Bai5-NgoaiViGPIO.map" -Wl,--gc-sections -static -L"C:\Users\PC\Downloads\SDK_1.0.3_NUCLEO-F401RE\lib_stm" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: Bai5-NgoaiViGPIO.elf
  
@@ -9,15 +9,15 @@ arm-none-eabi-objdump -h -S  Bai5-NgoaiViGPIO.elf  > "Bai5-NgoaiViGPIO.list"
 arm-none-eabi-objcopy  -O ihex  Bai5-NgoaiViGPIO.elf  "Bai5-NgoaiViGPIO.hex"
 arm-none-eabi-objcopy  -O binary  Bai5-NgoaiViGPIO.elf  "Bai5-NgoaiViGPIO.bin"
    text	   data	    bss	    dec	    hex	filename
-   1752	      8	   1568	   3328	    d00	Bai5-NgoaiViGPIO.elf
+   1740	      8	   1568	   3316	    cf4	Bai5-NgoaiViGPIO.elf
 Finished building: default.size.stdout
- 
 Finished building: Bai5-NgoaiViGPIO.list
-Finished building: Bai5-NgoaiViGPIO.hex
+ 
 Finished building: Bai5-NgoaiViGPIO.bin
+Finished building: Bai5-NgoaiViGPIO.hex
  
  
  
 
-20:43:39 Build Finished. 0 errors, 0 warnings. (took 1s.920ms)
+21:57:42 Build Finished. 0 errors, 0 warnings. (took 3s.233ms)
 
