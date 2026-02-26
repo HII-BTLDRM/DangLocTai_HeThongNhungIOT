@@ -28,4 +28,11 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>SDK_1.0.3_NUCLEO-F401RE</name>
+			<type>2</type>
+			<location>C:/Users/PC/Downloads/SDK_1.0.3_NUCLEO-F401RE</location>
+		</link>
+	</linkedResources>
 </projectDescription>

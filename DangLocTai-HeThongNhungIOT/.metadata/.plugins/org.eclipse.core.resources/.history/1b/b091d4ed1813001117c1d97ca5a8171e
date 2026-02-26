@@ -1,0 +1,96 @@
+#include "stm32f401re_rcc.h"
+#include "stm32f401re_gpio.h"
+
+// --- ĐỊNH NGHĨA CHÂN CẮM ---
+#define LED_PORT         GPIOA
+#define LED_PIN          GPIO_Pin_5
+
+#define BUTTON_PORT      GPIOC
+#define BUTTON_PIN       GPIO_Pin_13
+
+// --- HÀM DELAY THÔ SƠ (Dùng cho 8MHz) ---
+void delay_ms(volatile uint32_t ms) {
+    // Với xung nhịp 8MHz, vòng lặp này xấp xỉ tạo ra trễ theo mili-giây
+    for (volatile uint32_t i = 0; i < (ms * 1000); i++);
+}
+
+// --- HÀM ÉP XUNG NHỊP VỀ 8MHz ---
+void SystemClock_8MHz(void) {
+    // Mặc định chip chạy 16MHz. Ta dùng bộ chia 2 để hệ thống còn 8MHz
+    RCC_HCLKConfig(RCC_SYSCLK_Div2);
+}
+
+// --- HÀM KHỞI TẠO LED ---
+void Led_Init(void) {
+    GPIO_InitTypeDef GPIO_InitStruct;
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE); // Cấp clock Port A
+
+    GPIO_InitStruct.GPIO_Pin = LED_PIN;
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+
+    GPIO_Init(LED_PORT, &GPIO_InitStruct);
+}
+
+// --- HÀM KHỞI TẠO NÚT NHẤN ---
+void Button_Init(void) {
+    GPIO_InitTypeDef GPIO_InitStruct;
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE); // Cấp clock Port C
+
+    GPIO_InitStruct.GPIO_Pin = BUTTON_PIN;
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP; // Bật trở kéo lên nội bộ
+
+    GPIO_Init(BUTTON_PORT, &GPIO_InitStruct);
+}
+
+// ==========================================
+// CHƯƠNG TRÌNH CHÍNH
+// ==========================================
+int main(void) {
+    uint8_t led_state = 0; // Biến lưu trạng thái đèn (0: Tắt, 1: Sáng)
+
+    // 1. Hạ xung nhịp xuống 8MHz để Proteus chạy mượt
+    SystemClock_8MHz();
+
+    // 2. Khởi tạo phần cứng
+    Led_Init();
+    Button_Init();
+
+    // 3. Đảm bảo đèn LED tắt khi mới cấp điện
+    GPIO_ResetBits(LED_PORT, LED_PIN);
+
+    // 4. Vòng lặp hoạt động
+    while (1) {
+        // HÀM SPL: Đọc trạng thái chân PC13.
+        // Vì có trở kéo lên (Pull-up) nên bình thường là mức 1, bấm nút là mức 0 (Bit_RESET)
+        if (GPIO_ReadInputDataBit(BUTTON_PORT, BUTTON_PIN) == Bit_RESET) {
+
+            delay_ms(20); // Chờ 20ms để chống rung cơ học
+
+            // Xác nhận lại chắc chắn nút vẫn đang bị bấm
+            if (GPIO_ReadInputDataBit(BUTTON_PORT, BUTTON_PIN) == Bit_RESET) {
+
+                // Đảo trạng thái biến
+                led_state = !led_state;
+
+                // Bật/Tắt LED thực tế dựa vào biến
+                if (led_state == 1) {
+                    GPIO_SetBits(LED_PORT, LED_PIN);   // Bật LED (Kéo chân PA5 lên 3.3V)
+                } else {
+                    GPIO_ResetBits(LED_PORT, LED_PIN); // Tắt LED (Kéo chân PA5 xuống 0V)
+                }
+
+                // BƯỚC QUAN TRỌNG NHẤT: Chờ người dùng thả tay khỏi nút mới được đi tiếp
+                while (GPIO_ReadInputDataBit(BUTTON_PORT, BUTTON_PIN) == Bit_RESET) {
+                    // Trống (Đứng chờ ở đây)
+                }
+
+                delay_ms(20); // Chống rung lúc nhả nút
+            }
+        }
+    }
+}

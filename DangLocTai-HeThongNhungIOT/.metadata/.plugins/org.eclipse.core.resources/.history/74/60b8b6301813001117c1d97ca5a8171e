@@ -1,0 +1,115 @@
+#include <stdint.h>
+#include <stm32f401re_gpio.h>
+#include <stm32f401re_rcc.h>
+
+#define LOW                   0
+#define BTN_PRESS             LOW
+
+// Định nghĩa trạng thái LED
+#define GPIO_PIN_SET          1
+#define GPIO_PIN_RESET        0
+#define GPIO_PIN_LOW          0
+#define GPIO_PIN_HIGH         1
+
+// Định nghĩa chân LED (PA5)
+#define LED_GPIO_PORT         GPIOA
+#define LED_GPIO_PIN          GPIO_Pin_5
+#define LEDControl_SetClock   RCC_AHB1Periph_GPIOA
+
+// Định nghĩa chân Nút nhấn (PC13)
+#define BUTTON_GPIO_PORT      GPIOC
+#define BUTTON_GPIO_PIN       GPIO_Pin_13
+#define BUTTONControl_SetClock RCC_AHB1Periph_GPIOC
+
+// Hàm Delay tương đối dùng vòng lặp
+void delay(void) {
+    for (volatile uint32_t i = 0; i < 500000; i++);
+}
+
+// Hàm khởi tạo LED
+static void Led_init(void) {
+    GPIO_InitTypeDef GPIO_InitStructure;
+    RCC_AHB1PeriphClockCmd(LEDControl_SetClock, ENABLE);
+
+    GPIO_InitStructure.GPIO_Pin = LED_GPIO_PIN;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
+
+    GPIO_Init(LED_GPIO_PORT, &GPIO_InitStructure);
+}
+
+// Hàm khởi tạo Nút nhấn
+static void Button_init(void) {
+    GPIO_InitTypeDef GPIO_InitStructure;
+    RCC_AHB1PeriphClockCmd(BUTTONControl_SetClock, ENABLE);
+
+    GPIO_InitStructure.GPIO_Pin = BUTTON_GPIO_PIN;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+
+    GPIO_Init(BUTTON_GPIO_PORT, &GPIO_InitStructure);
+}
+
+// Hàm thay đổi trạng thái LED
+static void LedControl_SetStatus(GPIO_TypeDef *GPIOx, uint16_t GPIO_PIN, uint8_t Status) {
+    if (Status == GPIO_PIN_SET) {
+        GPIOx->BSRRL = GPIO_PIN;
+    }
+    if (Status == GPIO_PIN_RESET) {
+        GPIOx->BSRRH = GPIO_PIN;
+    }
+}
+
+// Hàm đọc trạng thái Nút nhấn
+static uint8_t ButtonRead_Status(GPIO_TypeDef *GPIOx, uint16_t GPIO_PIN) {
+    uint8_t Read_Pin = 0x00;
+    if ((GPIOx->IDR & GPIO_PIN) != (uint32_t) Bit_RESET) {
+        Read_Pin = (uint8_t) Bit_SET;
+    } else {
+        Read_Pin = (uint8_t) Bit_RESET;
+    }
+    return Read_Pin;
+}
+
+// ==========================================
+// HÀM MAIN BẮT BUỘC PHẢI CÓ
+// ==========================================
+int main(void) {
+    uint8_t status = 0;
+
+    // Khởi tạo phần cứng
+    Led_init();
+    Button_init();
+
+    // Tắt LED khi mới bật điện
+    LedControl_SetStatus(LED_GPIO_PORT, LED_GPIO_PIN, GPIO_PIN_LOW);
+
+    // Vòng lặp vô tận (Trái tim của vi điều khiển)
+    while (1) {
+        // Kiểm tra xem nút có được nhấn không (Vì Pull-up nên nhấn vào là mức LOW)
+        if (ButtonRead_Status(BUTTON_GPIO_PORT, BUTTON_GPIO_PIN) == BTN_PRESS) {
+            delay(); // Chống rung (Debounce) lần 1
+
+            // Kiểm tra lại chắc chắn là nút đang được nhấn
+            if (ButtonRead_Status(BUTTON_GPIO_PORT, BUTTON_GPIO_PIN) == BTN_PRESS) {
+
+                status = !status; // Đảo trạng thái biến (0 thành 1, 1 thành 0)
+
+                // Xuất trạng thái ra đèn LED
+                if (status == 1) {
+                    LedControl_SetStatus(LED_GPIO_PORT, LED_GPIO_PIN, GPIO_PIN_HIGH);
+                } else {
+                    LedControl_SetStatus(LED_GPIO_PORT, LED_GPIO_PIN, GPIO_PIN_LOW);
+                }
+
+                // Chờ người dùng nhả nút ra thì mới vòng lại
+                while (ButtonRead_Status(BUTTON_GPIO_PORT, BUTTON_GPIO_PIN) == BTN_PRESS);
+                delay(); // Chống rung lúc nhả nút
+            }
+        }
+    }
+    return 0;
+}

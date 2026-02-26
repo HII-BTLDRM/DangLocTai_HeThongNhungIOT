@@ -1,0 +1,20 @@
+/*
+ * Bai1.c
+ *
+ *  Created on: Feb 26, 2026
+ *      Author: PC
+ */
+
+#include <stdint.h>
+
+int main(void)
+{
+    // Các lệnh khởi tạo phần cứng (LED, Nút nhấn...) sẽ viết ở đây
+
+    while(1)
+    {
+        // Vòng lặp vô tận: Các lệnh chạy liên tục (nhấp nháy LED, đọc nút...) sẽ viết ở đây
+    }
+
+    return 0; // Thực tế vi điều khiển sẽ không bao giờ chạy đến dòng này vì bị kẹt ở while(1)
+}
