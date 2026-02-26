@@ -1,0 +1,7 @@
+buff.c:53:1:bufInit	24	static
+buff.c:72:1:bufNumItems	16	static
+buff.c:85:1:bufIsFull	16	static
+buff.c:98:1:bufIsEmpty	16	static
+buff.c:111:1:bufFlush	16	static
+buff.c:129:1:bufEnDat	24	static,ignoring_inline_asm
+buff.c:160:1:bufDeDat	24	static,ignoring_inline_asm

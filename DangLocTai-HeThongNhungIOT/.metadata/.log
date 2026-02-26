@@ -25,3 +25,9 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64
 
 !ENTRY org.eclipse.cdt.core 1 0 2026-02-26 22:10:11.367
 !MESSAGE Indexed 'Bai6-LapTrinhThuVienChoGPIO' (2 sources, 53 headers) in 1.87 sec: 1,962 declarations; 2,808 references; 0 unresolved inclusions; 1 syntax errors; 2 unresolved names (0.042%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-02-26 22:39:49.949
+!MESSAGE Indexed 'Bai8-CauHinhNgatChoChanGPIO' (2 sources, 53 headers) in 2.5 sec: 1,962 declarations; 2,808 references; 0 unresolved inclusions; 1 syntax errors; 2 unresolved names (0.042%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-02-26 22:48:34.053
+!MESSAGE Indexed 'Bai9-TongQuanVeNgoaiViSPI' (2 sources, 53 headers) in 1.63 sec: 1,962 declarations; 2,808 references; 0 unresolved inclusions; 1 syntax errors; 2 unresolved names (0.042%)

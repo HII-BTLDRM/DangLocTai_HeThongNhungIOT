@@ -1,0 +1,6 @@
+Bai2.c:17:6:SystemClock_Config_8MHz	8	static
+Bai2.c:22:6:delay_ms	24	static
+Bai2.c:27:6:Led_Init	16	static
+Bai2.c:41:6:Interrupt_Init	32	static
+Bai2.c:74:6:EXTI3_IRQHandler	8	static
+Bai2.c:84:5:main	8	static

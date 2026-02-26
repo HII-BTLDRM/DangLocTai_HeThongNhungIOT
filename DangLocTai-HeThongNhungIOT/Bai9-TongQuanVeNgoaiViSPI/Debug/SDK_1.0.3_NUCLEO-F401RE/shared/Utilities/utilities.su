@@ -1,0 +1,6 @@
+utilities.c:49:1:searchArrayInArray	32	static
+utilities.c:83:1:hex2Char	24	static
+utilities.c:101:1:String2Uint	40	static
+utilities.c:142:1:memsetl	16	static
+utilities.c:159:1:memcpyl	24	static
+utilities.c:176:1:valInRange	24	static

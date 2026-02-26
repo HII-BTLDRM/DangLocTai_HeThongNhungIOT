@@ -1,0 +1,9 @@
+Bai1.c:50:6:SystemClock_Config_8MHz	8	static
+Bai1.c:54:6:delay_ms	24	static
+Bai1.c:61:13:Led_Init	16	static
+Bai1.c:73:13:Button_Init	16	static
+Bai1.c:87:13:SPI_Master_Init	40	static
+Bai1.c:131:13:SPI_Slave_Init	40	static
+Bai1.c:190:13:Send_Data	16	static
+Bai1.c:207:6:SPI1_IRQHandler	8	static
+Bai1.c:220:5:main	16	static
